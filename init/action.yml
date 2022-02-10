@@ -1,0 +1,26 @@
+name: Build source rpm in copr
+inputs:
+  token:
+    description: Copr API token
+    required: true
+outputs:
+  coprcfg:
+    description: Path to the copr configuration file
+    value: ${{ steps.create.outputs.coprcfg }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Install copr-cli
+      shell: bash
+      run: |
+        pip3 install copr-cli
+
+    - name: Create copr configuration
+      id: create
+      shell: bash
+      env:
+        TOKEN: ${{ inputs.token }}
+      run: |
+        dir=`mktemp -d`
+        echo -e "$TOKEN" > $dir/.coprcfg
+        echo ::set-output name=coprcfg::$dir/.coprcfg
